@@ -8,3 +8,23 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/trailofbits/supply_chain"
 
 [dependencies]
+assert_cmd = "2.2"
+serde_json = "1.0"
+similar-asserts = "2.0"
+
+[dev-dependencies]
+regex = "1.13"
+tempfile = "3.27"
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ["cfg(dylint_lib, values(any()))"]
+
+[[workspace.metadata.dylint.libraries]]
+git = "https://github.com/trailofbits/dylint"
+pattern = [
+    "examples/general",
+    "examples/supplementary",
+    "examples/restriction/inconsistent_qualification",
+    "examples/restriction/misleading_variable_name",
+]
