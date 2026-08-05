@@ -1,0 +1,10 @@
+[package]
+name = "supply_chain"
+version = "0.0.0"
+authors = ["Samuel Moelius <sam@moeli.us>"]
+description = "A wrapper around cargo-supply-chain"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/trailofbits/supply_chain"
+
+[dependencies]
