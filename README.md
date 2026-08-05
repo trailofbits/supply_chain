@@ -51,9 +51,9 @@ For each check, `supply_chain`:
 
 1. Runs `cargo supply-chain update --cache-max-age=0s`.
 2. Runs `cargo supply-chain json --no-dev`.
-3. Removes all `avatar` fields from the JSON report.
-4. Pretty-prints the report and compares it with the stored snapshot, or updates the snapshot when
-   `BLESS` is set to a value other than `0`.
+3. Removes all `avatar` fields from the JSON report and pretty-prints it.
+4. Compares the report with the stored snapshot, or updates the snapshot when `BLESS` is set to a
+   value other than `0`.
 
 The exit status of the update command is ignored, but the report command must succeed.
 
