@@ -65,6 +65,7 @@ jobs:
 
       - name: Install tools
         run: |
+          rustup component add clippy --toolchain nightly
           cargo install cargo-dylint dylint-link || true
           cargo install cargo-supply-chain       || true
           cargo install group-runner             || true
