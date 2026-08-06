@@ -48,6 +48,15 @@ fn markdown_link_check() {
 }
 
 #[test]
+fn readme_does_not_use_inline_links() {
+    let readme = read_to_string("README.md").unwrap();
+    assert!(
+        !Regex::new(r"\[[^\]]*\]\(").unwrap().is_match(&readme),
+        "readme uses inline links",
+    );
+}
+
+#[test]
 fn readme_reference_links_are_sorted() {
     let re = Regex::new(r"^\[[^^\]]*\]:").unwrap();
     let readme = read_to_string("README.md").unwrap();
@@ -62,4 +71,19 @@ fn readme_reference_links_are_sorted() {
         "contents of README.md are not what was expected:\n{}",
         links_sorted.join("\n")
     );
+}
+
+#[test]
+fn readme_reference_links_are_used() {
+    let re = Regex::new(r"(?m)^(\[[^\]]*\]):").unwrap();
+    let readme = read_to_string("README.md").unwrap();
+    for captures in re.captures_iter(&readme) {
+        assert_eq!(2, captures.len());
+        let m = captures.get(1).unwrap();
+        assert!(
+            readme[..m.start()].contains(m.as_str()),
+            "{} is unused",
+            m.as_str()
+        );
+    }
 }
