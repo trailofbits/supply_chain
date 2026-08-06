@@ -49,7 +49,7 @@ and commit the updated snapshot.
 
 For each check, `supply_chain`:
 
-1. Runs `cargo supply-chain update --cache-max-age=0s`.
+1. On the first check in each process, runs `cargo supply-chain update --cache-max-age=0s`.
 2. Runs `cargo supply-chain json --no-dev`.
 3. Removes all `avatar` fields from the JSON report and pretty-prints it.
 4. Compares the report with the stored snapshot, or updates the snapshot when `BLESS` is set to a
