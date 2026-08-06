@@ -8,32 +8,12 @@
         "name": "Andrew Gallant"
       }
     ],
-    "anstyle": [
+    "anyhow": [
       {
-        "id": 460,
-        "kind": "team",
-        "login": "github:rust-cli:maintainers",
-        "name": "Maintainers"
-      },
-      {
-        "id": 6743,
+        "id": 3618,
         "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
-      }
-    ],
-    "assert_cmd": [
-      {
-        "id": 460,
-        "kind": "team",
-        "login": "github:rust-cli:maintainers",
-        "name": "Maintainers"
-      },
-      {
-        "id": 6743,
-        "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
+        "login": "dtolnay",
+        "name": "David Tolnay"
       }
     ],
     "bstr": [
@@ -56,14 +36,6 @@
         "kind": "user",
         "login": "djc",
         "name": "Dirkjan Ochtman"
-      }
-    ],
-    "difflib": [
-      {
-        "id": 3481,
-        "kind": "user",
-        "login": "DimaKudosh",
-        "name": "Dima Kudosh"
       }
     ],
     "encode_unicode": [
@@ -126,36 +98,6 @@
         "kind": "user",
         "login": "BurntSushi",
         "name": "Andrew Gallant"
-      }
-    ],
-    "predicates": [
-      {
-        "id": 2584,
-        "kind": "user",
-        "login": "nastevens",
-        "name": "Nick Stevens"
-      },
-      {
-        "id": 6743,
-        "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
-      }
-    ],
-    "predicates-core": [
-      {
-        "id": 6743,
-        "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
-      }
-    ],
-    "predicates-tree": [
-      {
-        "id": 6743,
-        "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
       }
     ],
     "proc-macro2": [
@@ -282,20 +224,6 @@
         "name": "David Tolnay"
       }
     ],
-    "termtree": [
-      {
-        "id": 460,
-        "kind": "team",
-        "login": "github:rust-cli:maintainers",
-        "name": "Maintainers"
-      },
-      {
-        "id": 6743,
-        "kind": "user",
-        "login": "epage",
-        "name": "Ed Page"
-      }
-    ],
     "unicode-ident": [
       {
         "id": 3618,
@@ -334,14 +262,6 @@
         "kind": "user",
         "login": "sujayakar",
         "name": "Sujay Jayakar"
-      }
-    ],
-    "wait-timeout": [
-      {
-        "id": 1,
-        "kind": "user",
-        "login": "alexcrichton",
-        "name": "Alex Crichton"
       }
     ],
     "windows-link": [
