@@ -1,0 +1,28 @@
+[package]
+name = "cargo_10801"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# The `[dependencies]` section below and the `serialization` feature are copied from Cargo issue
+# #10801 and should not be updated. `serde` is an enabled optional dependency. `time` is optional
+# and never enabled, but the weak `time?/serde-well-known` reference drags it into the resolved
+# dependency graph anyway; that is the bug. `chrono` is the control: it is optional and mentioned
+# by no feature, so it stays out of the graph.
+[dependencies]
+serde = { version = "1.0.133", optional = true, default-features = false }
+time = { version = "=0.3.10", optional = true, default-features = false }
+chrono = { version = "=0.4.18", optional = true, default-features = false }
+
+[dev-dependencies]
+supply_chain = { path = "../.." }
+
+# Cargo issue #10801's repro is two crates: `foo`, which declares the dependencies above and
+# defines the `serialization` feature, and `bar`, which enables `foo`'s `serialization` feature.
+# This fixture collapses them into a single crate, so its `default` feature enables the
+# `serialization` feature.
+[features]
+default = ["serialization"]
+serialization = ["dep:serde", "time?/serde-well-known"]
+
+[workspace]
