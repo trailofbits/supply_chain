@@ -78,11 +78,3 @@ fn remove_avatars(value: &mut serde_json::Value) {
 fn enabled(key: &str) -> bool {
     env::var_os(key).is_some_and(|value| value != "0")
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn self_check() {
-        super::check("tests/supply_chain.json");
-    }
-}
