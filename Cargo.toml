@@ -1,6 +1,6 @@
 [package]
 name = "supply_chain"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Samuel Moelius <sam@moeli.us>"]
 description = "A wrapper around cargo-supply-chain"
 edition = "2024"
