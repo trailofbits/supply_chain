@@ -63,7 +63,7 @@ not determine whether a dependency or publisher is trustworthy.
 ## Known issues
 
 Because Cargo can include weakly referenced optional dependencies in the resolved dependency graph
-([Cargo issue #10801][cargo-10801]), the report can include dependencies that are not enabled. The
+(Cargo issue [#10801][cargo-10801]), the report can include dependencies that are not enabled. The
 [`cargo_10801` fixture][cargo-10801-fixture] demonstrates this behavior: its `serialization`
 feature enables `serde` and weakly requests the `time?/serde-well-known` feature without enabling
 the optional `time` dependency. Although `time` is never built, the fixture's `supply_chain.json`
@@ -71,6 +71,16 @@ includes `time` and `time`'s own dependencies `itoa`, `libc`, and `num_threads`.
 
 The fixture's `chrono` dependency is the control: it is likewise optional and not enabled, but no
 feature mentions it, and it does not appear in the report.
+
+While this repository includes a reproduction of just Cargo issue [#10801][cargo-10801], other
+Cargo issues suggest false positives may appear in the report in other ways:
+
+- [#7754][cargo-7754]: `cargo metadata` resolves features only roughly, so a dependency's optional
+  dependencies can appear even when the feature that would enable them is off.
+- [#9863][cargo-9863]: `cargo metadata` does not mark feature-enabled transitive platform-specific
+  dependencies as platform-specific.
+- [#15784][cargo-15784]: closed in favor of [#7754][cargo-7754] and [#10801][cargo-10801]; its
+  discussion describes how the two combine.
 
 ## License
 
@@ -81,4 +91,7 @@ Licensed under either of the following, at your option:
 
 [cargo-10801-fixture]: fixtures/cargo_10801
 [cargo-10801]: https://github.com/rust-lang/cargo/issues/10801
+[cargo-15784]: https://github.com/rust-lang/cargo/issues/15784
+[cargo-7754]: https://github.com/rust-lang/cargo/issues/7754
+[cargo-9863]: https://github.com/rust-lang/cargo/issues/9863
 [cargo-supply-chain]: https://github.com/rust-secure-code/cargo-supply-chain
