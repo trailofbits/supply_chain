@@ -34,19 +34,19 @@ pub fn check(path: impl AsRef<Path>) {
 fn check_impl(path: impl AsRef<Path>, bless: bool) -> Result<()> {
     update()?;
 
-    let stdout_normalized = generate_report(".")?;
+    let report_actual = generate_report(".")?;
 
     if bless {
-        write(&path, stdout_normalized)
+        write(&path, report_actual)
             .with_context(|| format!("failed to write `{}`", path.as_ref().display()))?;
     } else {
-        let stdout_expected = read_to_string(&path)
+        let report_expected = read_to_string(&path)
             .with_context(|| format!("failed to read `{}`", path.as_ref().display()))?;
 
         ensure!(
-            stdout_expected == stdout_normalized,
+            report_expected == report_actual,
             "{}",
-            SimpleDiff::from_str(&stdout_expected, &stdout_normalized, "expected", "actual")
+            SimpleDiff::from_str(&report_expected, &report_actual, "expected", "actual")
         );
     }
 
@@ -89,9 +89,9 @@ fn generate_report(dir: impl AsRef<Path>) -> Result<String> {
     normalize_report(&output.stdout)
 }
 
-fn normalize_report(output: &[u8]) -> Result<String> {
-    let output = std::str::from_utf8(output)?;
-    let mut value = serde_json::Value::from_str(output)?;
+fn normalize_report(report_bytes: &[u8]) -> Result<String> {
+    let report = std::str::from_utf8(report_bytes)?;
+    let mut value = serde_json::Value::from_str(report)?;
     remove_avatars(&mut value);
     serde_json::to_string_pretty(&value).map_err(Into::into)
 }
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn normalize_report_removes_avatars_and_pretty_prints() {
-        let output = br#"{
+        let report_bytes = br#"{
 "crates_io_crates":{"example-crate":[{
 "id":1001,"kind":"user","login":"alice-example","name":"Alice Example","avatar":"ignored"
 }]},
@@ -216,7 +216,7 @@ mod tests {
 
         assert_eq!(
             to_string_pretty(&expected).unwrap(),
-            normalize_report(output).unwrap()
+            normalize_report(report_bytes).unwrap()
         );
     }
 
