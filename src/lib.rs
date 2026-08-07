@@ -34,16 +34,7 @@ pub fn check(path: impl AsRef<Path>) {
 fn check_impl(path: impl AsRef<Path>, bless: bool) -> Result<()> {
     update()?;
 
-    let mut command = Command::new("cargo");
-    command.args(["supply-chain", "json", "--no-dev"]);
-    let output = command
-        .output()
-        .with_context(|| format!("failed to get output of command: {command:?}"))?;
-    if !output.status.success() {
-        bail!("command failed: {command:?}");
-    }
-
-    let stdout_normalized = normalize_report(&output.stdout)?;
+    let stdout_normalized = generate_report(".")?;
 
     if bless {
         write(&path, stdout_normalized)
@@ -78,6 +69,24 @@ fn update() -> Result<()> {
         .as_ref()
         .copied()
         .map_err(|error| anyhow!("{error:#}"))
+}
+
+fn generate_report(dir: impl AsRef<Path>) -> Result<String> {
+    let mut command = Command::new("cargo");
+    command
+        .args(["supply-chain", "json", "--no-dev"])
+        .current_dir(dir);
+    let output = command
+        .output()
+        .with_context(|| format!("failed to get output of command: {command:?}"))?;
+    if !output.status.success() {
+        bail!(
+            "command failed: {command:?}\n{}",
+            String::from_utf8_lossy(&output.stderr).trim_end()
+        );
+    }
+
+    normalize_report(&output.stdout)
 }
 
 fn normalize_report(output: &[u8]) -> Result<String> {
@@ -116,7 +125,7 @@ fn enabled(key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{check_impl, normalize_report, remove_avatars};
+    use super::{check_impl, generate_report, normalize_report, remove_avatars};
     use serde_json::{json, to_string_pretty};
     use std::fs;
 
@@ -169,6 +178,17 @@ mod tests {
 
         assert!(message.contains("expected"));
         assert!(message.contains("actual"));
+    }
+
+    #[test]
+    fn generate_report_includes_stderr_when_command_fails() {
+        let tempdir = tempfile::tempdir().unwrap();
+
+        let error = generate_report(&tempdir).unwrap_err();
+        let message = error.to_string();
+
+        assert!(message.contains("command failed"), "{message}");
+        assert!(message.contains("could not find `Cargo.toml`"), "{message}");
     }
 
     #[test]
