@@ -72,7 +72,7 @@ includes `time` and `time`'s own dependencies `itoa`, `libc`, and `num_threads`.
 The fixture's `chrono` dependency is the control: it is likewise optional and not enabled, but no
 feature mentions it, and it does not appear in the report.
 
-While this repository includes a reproduction of just Cargo issue [#10801][cargo-10801], other
+While this repository includes a reproduction of Cargo issue [#10801][cargo-10801] only, other
 Cargo issues suggest false positives may appear in the report in other ways:
 
 - [#7754][cargo-7754]: `cargo metadata` resolves features only roughly, so a dependency's optional
