@@ -11,7 +11,7 @@ publish = false
 # by no feature, so it stays out of the graph.
 [dependencies]
 serde = { version = "1.0.133", optional = true, default-features = false }
-time = { version = "=0.3.10", optional = true, default-features = false }
+time = { version = "=0.3.47", optional = true, default-features = false }
 chrono = { version = "=0.4.18", optional = true, default-features = false }
 
 # This fixture's `Cargo.lock` pins `supply_chain`'s own dependencies. They do not contribute to
