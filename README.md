@@ -57,6 +57,13 @@ For each check, `supply_chain`:
 
 The exit status of the update command is ignored, but the report command must succeed.
 
+The update command's progress bar is hidden by default. Set `PROGRESS` to a value other than `0`
+to show it:
+
+```console
+PROGRESS=1 cargo test supply_chain
+```
+
 This crate provides a reviewable signal when a dependency's supply-chain metadata changes. It does
 not determine whether a dependency or publisher is trustworthy.
 
