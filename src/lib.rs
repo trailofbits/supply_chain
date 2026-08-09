@@ -4,7 +4,7 @@ use std::{
     env,
     fs::{read_to_string, write},
     path::Path,
-    process::{Command, ExitStatus},
+    process::{Command, ExitStatus, Stdio},
     str::FromStr,
     sync::OnceLock,
 };
@@ -13,7 +13,7 @@ use std::{
 ///
 /// On the first call in each process, the function runs
 /// `cargo supply-chain update --cache-max-age=0s`. The exit status of the update command is
-/// ignored.
+/// ignored. Its progress bar is hidden unless `PROGRESS` is set to a value other than `"0"`.
 ///
 /// The function then runs `cargo supply-chain json --no-dev`. The report is normalized by removing
 /// all `avatar` fields and pretty-printing the JSON.
@@ -59,6 +59,9 @@ fn update() -> Result<()> {
     let result = UPDATED.get_or_init(|| {
         let mut command = Command::new("cargo");
         command.args(["supply-chain", "update", "--cache-max-age=0s"]);
+        if !enabled("PROGRESS") {
+            command.stderr(Stdio::null());
+        }
         let _: ExitStatus = command
             .status()
             .with_context(|| format!("failed to get status of command: {command:?}"))?;
