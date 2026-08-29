@@ -2,6 +2,7 @@ use anyhow::{Context, Result, anyhow, bail, ensure};
 use similar_asserts::SimpleDiff;
 use std::{
     env,
+    ffi::OsStr,
     fs::{read_to_string, write},
     path::Path,
     process::{Command, ExitStatus, Stdio},
@@ -9,11 +10,16 @@ use std::{
     sync::OnceLock,
 };
 
+/// Convenience constant for calling [`check_with_args`] or [`check_impl`] with no additional
+/// arguments.
+const NO_ARGS: [&OsStr; 0] = [];
+
 /// Checks or updates a JSON snapshot of a normalized supply-chain report.
 ///
 /// On the first call in each process, the function runs
 /// `cargo supply-chain update --cache-max-age=0s`. The exit status of the update command is
-/// ignored. Its progress bar is hidden unless `PROGRESS` is set to a value other than `"0"`.
+/// ignored. Its standard error, which carries both its progress bar and any error messages, is
+/// discarded unless `PROGRESS` is set to a value other than `"0"`.
 ///
 /// The function then runs `cargo supply-chain json --no-dev`. The report is normalized by removing
 /// all `avatar` fields and pretty-printing the JSON.
@@ -28,13 +34,27 @@ use std::{
 /// or JSON, the snapshot cannot be read or written, or the normalized report differs from the
 /// snapshot.
 pub fn check(path: impl AsRef<Path>) {
-    check_impl(path, enabled("BLESS")).unwrap()
+    check_with_args(path, NO_ARGS)
 }
 
-fn check_impl(path: impl AsRef<Path>, bless: bool) -> Result<()> {
+/// Like [`check`] but allows additional arguments to be passed to the `cargo supply-chain json`
+/// command.
+pub fn check_with_args<I, S>(path: impl AsRef<Path>, args: I)
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<OsStr>,
+{
+    check_impl(path, args, enabled("BLESS")).unwrap()
+}
+
+fn check_impl<I, S>(path: impl AsRef<Path>, args: I, bless: bool) -> Result<()>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<OsStr>,
+{
     update()?;
 
-    let report_actual = generate_report(".")?;
+    let report_actual = generate_report(args, ".")?;
 
     if bless {
         write(&path, report_actual)
@@ -74,11 +94,15 @@ fn update() -> Result<()> {
         .map_err(|error| anyhow!("{error:#}"))
 }
 
-fn generate_report(dir: impl AsRef<Path>) -> Result<String> {
+fn generate_report<I, S>(args: I, dir: impl AsRef<Path>) -> Result<String>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<OsStr>,
+{
     let mut command = Command::new("cargo");
-    command
-        .args(["supply-chain", "json", "--no-dev"])
-        .current_dir(dir);
+    command.args(["supply-chain", "json", "--no-dev"]);
+    command.args(args);
+    command.current_dir(dir);
     let output = command
         .output()
         .with_context(|| format!("failed to get output of command: {command:?}"))?;
@@ -128,7 +152,7 @@ fn enabled(key: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{check_impl, generate_report, normalize_report, remove_avatars};
+    use super::{NO_ARGS, check_impl, generate_report, normalize_report, remove_avatars};
     use serde_json::{json, to_string_pretty};
     use std::fs;
 
@@ -144,10 +168,10 @@ mod tests {
         let tempdir = tempfile::tempdir().unwrap();
         let path_buf = tempdir.path().join("supply_chain.json");
 
-        check_impl(&path_buf, true).unwrap();
+        check_impl(&path_buf, NO_ARGS, true).unwrap();
         assert!(path_buf.is_file());
 
-        check_impl(&path_buf, false).unwrap();
+        check_impl(&path_buf, NO_ARGS, false).unwrap();
     }
 
     #[test]
@@ -155,7 +179,7 @@ mod tests {
         let tempdir = tempfile::tempdir().unwrap();
         let path_buf = tempdir.path().join("missing.json");
 
-        let error = check_impl(&path_buf, false).unwrap_err();
+        let error = check_impl(&path_buf, NO_ARGS, false).unwrap_err();
 
         assert_eq!(
             format!("failed to read `{}`", path_buf.display()),
@@ -176,7 +200,7 @@ mod tests {
         let path_buf = tempdir.path().join("supply_chain.json");
         fs::write(&path_buf, "{}").unwrap();
 
-        let error = check_impl(&path_buf, false).unwrap_err();
+        let error = check_impl(&path_buf, NO_ARGS, false).unwrap_err();
         let message = error.to_string();
 
         assert!(message.contains("expected"));
@@ -184,10 +208,25 @@ mod tests {
     }
 
     #[test]
+    fn check_impl_forwards_args() {
+        let tempdir = tempfile::tempdir().unwrap();
+        let path_buf = tempdir.path().join("supply_chain.json");
+
+        let error = check_impl(&path_buf, ["--no-such-flag"], true).unwrap_err();
+
+        assert_eq!(
+            r#"command failed: cd "." && "cargo" "supply-chain" "json" "--no-dev" "--no-such-flag"
+Error: `--no-such-flag` is not expected in this context"#,
+            error.to_string()
+        );
+        assert!(!path_buf.exists(), "{}", path_buf.display());
+    }
+
+    #[test]
     fn generate_report_includes_stderr_when_command_fails() {
         let tempdir = tempfile::tempdir().unwrap();
 
-        let error = generate_report(&tempdir).unwrap_err();
+        let error = generate_report(NO_ARGS, &tempdir).unwrap_err();
         let message = error.to_string();
 
         assert!(message.contains("command failed"), "{message}");
