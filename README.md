@@ -20,12 +20,25 @@ cargo add --dev supply_chain
 
 ## Usage
 
-Add a test that specifies where the snapshot should be stored:
+Add a test that calls [`check`] and specifies where the snapshot should be stored:
 
 ```rust
 #[test]
 fn supply_chain() {
     supply_chain::check("tests/supply_chain.json");
+}
+```
+
+To pass additional arguments to `cargo-supply-chain`, call [`check_with_args`]. For example,
+to include only dependencies for a particular target platform:
+
+```rust
+#[test]
+fn supply_chain() {
+    supply_chain::check_with_args(
+        "tests/supply_chain.json",
+        ["--target=x86_64-unknown-linux-gnu"],
+    );
 }
 ```
 
@@ -96,6 +109,8 @@ Licensed under either of the following, at your option:
 - Apache License, Version 2.0
 - MIT License
 
+[`check_with_args`]: src/lib.rs
+[`check`]: https://docs.rs/supply_chain/latest/supply_chain/fn.check.html
 [cargo-10801-fixture]: fixtures/cargo_10801
 [cargo-10801]: https://github.com/rust-lang/cargo/issues/10801
 [cargo-15784]: https://github.com/rust-lang/cargo/issues/15784
