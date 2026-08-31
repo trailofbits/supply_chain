@@ -109,7 +109,7 @@ Licensed under either of the following, at your option:
 - Apache License, Version 2.0
 - MIT License
 
-[`check_with_args`]: src/lib.rs
+[`check_with_args`]: https://docs.rs/supply_chain/latest/supply_chain/fn.check_with_args.html
 [`check`]: https://docs.rs/supply_chain/latest/supply_chain/fn.check.html
 [cargo-10801-fixture]: fixtures/cargo_10801
 [cargo-10801]: https://github.com/rust-lang/cargo/issues/10801
