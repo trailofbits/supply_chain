@@ -117,7 +117,7 @@ where
 }
 
 fn normalize_report(report_bytes: &[u8]) -> Result<String> {
-    let report = std::str::from_utf8(report_bytes)?;
+    let report = str::from_utf8(report_bytes)?;
     let mut value = serde_json::Value::from_str(report)?;
     remove_avatars(&mut value);
     serde_json::to_string_pretty(&value).map_err(Into::into)
